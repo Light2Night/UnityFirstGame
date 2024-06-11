@@ -15,10 +15,20 @@ public class Move : MonoBehaviour {
 		transform.Translate(moveDelta);
 
 		if (Input.GetButtonDown("Jump") && IsGrounded()) {
-			GetComponent<Rigidbody2D>().AddForce(Vector2.up * jump, ForceMode2D.Impulse);
+			GetComponent<Rigidbody2D>().AddForce(transform.up * jump, ForceMode2D.Impulse);
 		}
 
+		if (Input.GetKeyDown(KeyCode.Q)) {
+			GetComponent<Rigidbody2D>().AddTorque(0.4F, ForceMode2D.Impulse);
+		}
 
+		if (Input.GetKeyDown(KeyCode.E)) {
+			GetComponent<Rigidbody2D>().AddTorque(-0.4F, ForceMode2D.Impulse);
+		}
+
+		if (Input.GetKeyDown(KeyCode.R)) {
+			transform.Rotate(new Vector3(0, 0, 180));
+		}
 	}
 
 	private bool IsGrounded() {
