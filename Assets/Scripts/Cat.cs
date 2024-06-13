@@ -1,49 +1,81 @@
 using UnityEngine;
 
 public class Move : MonoBehaviour {
+	Animator animator;
+	Rigidbody2D rigidbodyObj;
+
 	float speed = 1000F;
+	float walkingSpeedMultiplier = 0.5F;
 	float jump = 6F;
-	float flip = 0.3F;
+	float flip = 0.5F;
+	float flipGrounded = 0.5F;
+	float flipInAir = 0.2F;
 	float x;
 	float groundCheckDistance = 0.03f;
-	Animator animator;
+	bool isGrounded;
 	bool isRunning;
+	bool isWalking;
+	float horizontalSpeed;
 
 	// Start is called before the first frame update
 	void Start() {
-		x = transform.localScale.x;
 		animator = GetComponent<Animator>();
+		rigidbodyObj = GetComponent<Rigidbody2D>();
+		x = transform.localScale.x;
 		isRunning = false;
 	}
 
 	// Update is called once per frame
 	void Update() {
-		if (IsGrounded()) {
-			isRunning = false;
+		isGrounded = IsGrounded();
+		isRunning = false;
+		isWalking = false;
+		flip = isGrounded ? flipGrounded : flipInAir;
+		horizontalSpeed = rigidbodyObj.velocity.x;
+
+		Debug.Log(horizontalSpeed);
+
+		if (isGrounded) {
 			if (Input.GetKey(KeyCode.A)) {
-				MoveHorizontally(-1);
-				isRunning = true;
+				if (Input.GetKey(KeyCode.S)) {
+					if (Mathf.Abs(horizontalSpeed) < 3)
+						MoveHorizontally(-1, walkingSpeedMultiplier);
+					isWalking = true;
+				}
+				else {
+					MoveHorizontally(-1);
+					isRunning = true;
+				}
 			}
 			if (Input.GetKey(KeyCode.D)) {
-				MoveHorizontally(1);
-				isRunning = true;
+				if (Input.GetKey(KeyCode.S)) {
+					if (Mathf.Abs(horizontalSpeed) < 3)
+						MoveHorizontally(1, walkingSpeedMultiplier);
+					isWalking = true;
+				}
+				else {
+					MoveHorizontally(1);
+					isRunning = true;
+				}
 			}
 
-			animator.SetBool("IsRunning", isRunning);
 
 			if (Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W)) {
-				GetComponent<Rigidbody2D>().AddForce(transform.up * jump, ForceMode2D.Impulse);
+				rigidbodyObj.AddForce(transform.up * jump, ForceMode2D.Impulse);
 			}
 		}
 
+		animator.SetBool("IsRunning", isRunning);
+		animator.SetBool("IsWalking", isWalking);
+		animator.SetBool("IsGrounded", isGrounded);
 
 		if (Input.GetKeyDown(KeyCode.Q)) {
-			GetComponent<Rigidbody2D>().AddTorque(flip, ForceMode2D.Impulse);
+			rigidbodyObj.AddTorque(flip, ForceMode2D.Impulse);
 			animator.SetBool("IsRunning", false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			GetComponent<Rigidbody2D>().AddTorque(-flip, ForceMode2D.Impulse);
+			rigidbodyObj.AddTorque(-flip, ForceMode2D.Impulse);
 			animator.SetBool("IsRunning", false);
 		}
 
@@ -65,8 +97,8 @@ public class Move : MonoBehaviour {
 		return hit.collider != null;
 	}
 
-	void MoveHorizontally(int sign) {
-		GetComponent<Rigidbody2D>().AddForce(sign * transform.right * speed * Time.deltaTime);
+	void MoveHorizontally(int sign, float speedMultiplier = 1) {
+		GetComponent<Rigidbody2D>().AddForce(sign * transform.right * (speed * speedMultiplier) * Time.deltaTime);
 
 		Vector3 v = transform.localScale;
 		v.x = sign * x;
