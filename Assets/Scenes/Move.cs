@@ -5,7 +5,7 @@ public class Move : MonoBehaviour {
 	float jump = 6F;
 	float flip = 0.3F;
 	float x;
-	float groundCheckDistance = 0.1f;
+	float groundCheckDistance = 0.03f;
 
 	// Start is called before the first frame update
 	void Start() {
