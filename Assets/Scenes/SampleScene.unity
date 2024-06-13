@@ -876,8 +876,8 @@ GameObject:
   - component: {fileID: 1233104740}
   - component: {fileID: 1233104742}
   - component: {fileID: 1233104743}
-  - component: {fileID: 1233104744}
   - component: {fileID: 1233104745}
+  - component: {fileID: 1233104744}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -964,6 +964,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06c7b1818aadd824d9db7508cb39ff0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundCheckDistance: 0.1
 --- !u!50 &1233104743
 Rigidbody2D:
   serializedVersion: 4

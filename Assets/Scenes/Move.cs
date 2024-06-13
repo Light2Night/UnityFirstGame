@@ -1,11 +1,11 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Move : MonoBehaviour {
-	float speed = 5;
+	float speed = 1000F;
 	float jump = 6F;
-	List<Collider2D> GroundColliders = new List<Collider2D>();
+	float flip = 0.3F;
 	float x;
+	float groundCheckDistance = 0.1f;
 
 	// Start is called before the first frame update
 	void Start() {
@@ -14,38 +14,51 @@ public class Move : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update() {
-		var moveDelta = Vector2.right * Input.GetAxis("Horizontal") * speed * Time.deltaTime;
-		transform.Translate(moveDelta);
+		if (IsGrounded()) {
+			if (Input.GetKey(KeyCode.A)) {
+				MoveHorizontally(-1);
+			}
+			if (Input.GetKey(KeyCode.D)) {
+				MoveHorizontally(1);
+			}
 
-		if (moveDelta.x > 0) {
-			Vector3 v = transform.localScale;
-			v.x = x;
-			transform.localScale = v;
-		}
-		else if (moveDelta.x < 0) {
-			Vector3 v = transform.localScale;
-			v.x = -x;
-			transform.localScale = v;
+			if (Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W)) {
+				GetComponent<Rigidbody2D>().AddForce(transform.up * jump, ForceMode2D.Impulse);
+			}
 		}
 
-		if (Input.GetButtonDown("Jump") && IsGrounded()) {
-			GetComponent<Rigidbody2D>().AddForce(transform.up * jump, ForceMode2D.Impulse);
-		}
 
 		if (Input.GetKeyDown(KeyCode.Q)) {
-			GetComponent<Rigidbody2D>().AddTorque(0.4F, ForceMode2D.Impulse);
+			GetComponent<Rigidbody2D>().AddTorque(flip, ForceMode2D.Impulse);
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			GetComponent<Rigidbody2D>().AddTorque(-0.4F, ForceMode2D.Impulse);
+			GetComponent<Rigidbody2D>().AddTorque(-flip, ForceMode2D.Impulse);
 		}
 
 		if (Input.GetKeyDown(KeyCode.R)) {
 			transform.Rotate(new Vector3(0, 0, 180));
 		}
+
+		//Debug.DrawLine(transform.position, -transform.up * 5, Color.blue, 2.0f, false);
 	}
 
 	bool IsGrounded() {
-		return true;
+		Collider2D collider = GetComponent<Collider2D>();
+		Vector2 bottom = collider.bounds.center - new Vector3(0, collider.bounds.extents.y + groundCheckDistance, 0);
+
+		RaycastHit2D hit = Physics2D.Raycast(bottom, Vector2.down, groundCheckDistance);
+
+		Debug.DrawLine(bottom, bottom + Vector2.down * groundCheckDistance, Color.green, 5F);
+
+		return hit.collider != null;
+	}
+
+	void MoveHorizontally(int sign) {
+		GetComponent<Rigidbody2D>().AddForce(sign * transform.right * speed * Time.deltaTime);
+
+		Vector3 v = transform.localScale;
+		v.x = sign * x;
+		transform.localScale = v;
 	}
 }
