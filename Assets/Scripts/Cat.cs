@@ -6,21 +6,30 @@ public class Move : MonoBehaviour {
 	float flip = 0.3F;
 	float x;
 	float groundCheckDistance = 0.03f;
+	Animator animator;
+	bool isRunning;
 
 	// Start is called before the first frame update
 	void Start() {
 		x = transform.localScale.x;
+		animator = GetComponent<Animator>();
+		isRunning = false;
 	}
 
 	// Update is called once per frame
 	void Update() {
 		if (IsGrounded()) {
+			isRunning = false;
 			if (Input.GetKey(KeyCode.A)) {
 				MoveHorizontally(-1);
+				isRunning = true;
 			}
 			if (Input.GetKey(KeyCode.D)) {
 				MoveHorizontally(1);
+				isRunning = true;
 			}
+
+			animator.SetBool("IsRunning", isRunning);
 
 			if (Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W)) {
 				GetComponent<Rigidbody2D>().AddForce(transform.up * jump, ForceMode2D.Impulse);
@@ -30,10 +39,12 @@ public class Move : MonoBehaviour {
 
 		if (Input.GetKeyDown(KeyCode.Q)) {
 			GetComponent<Rigidbody2D>().AddTorque(flip, ForceMode2D.Impulse);
+			animator.SetBool("IsRunning", false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
 			GetComponent<Rigidbody2D>().AddTorque(-flip, ForceMode2D.Impulse);
+			animator.SetBool("IsRunning", false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.R)) {
