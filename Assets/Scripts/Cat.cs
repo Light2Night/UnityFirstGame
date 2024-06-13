@@ -7,7 +7,7 @@ public class Move : MonoBehaviour {
 	float speed = 1000F;
 	float walkingSpeedMultiplier = 0.5F;
 	float jump = 6F;
-	float flip = 0.5F;
+	float flip;
 	float flipGrounded = 0.5F;
 	float flipInAir = 0.2F;
 	float x;
@@ -32,8 +32,6 @@ public class Move : MonoBehaviour {
 		isWalking = false;
 		flip = isGrounded ? flipGrounded : flipInAir;
 		horizontalSpeed = rigidbodyObj.velocity.x;
-
-		Debug.Log(horizontalSpeed);
 
 		if (isGrounded) {
 			if (Input.GetKey(KeyCode.A)) {
@@ -98,7 +96,7 @@ public class Move : MonoBehaviour {
 	}
 
 	void MoveHorizontally(int sign, float speedMultiplier = 1) {
-		GetComponent<Rigidbody2D>().AddForce(sign * transform.right * (speed * speedMultiplier) * Time.deltaTime);
+		rigidbodyObj.AddForce((speed * speedMultiplier) * sign * Time.deltaTime * transform.right);
 
 		Vector3 v = transform.localScale;
 		v.x = sign * x;
