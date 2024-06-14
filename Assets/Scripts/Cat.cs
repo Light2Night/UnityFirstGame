@@ -91,7 +91,7 @@ public class Move : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.F)) {
 			var directionSign = Mathf.Sign(transform.localScale.x);
 			var localPosition = transform.localPosition;
-			localPosition += 0.5F * directionSign * transform.right;
+			localPosition += 0.7F * directionSign * transform.right;
 
 			int angel = ((directionSign == 1) ? 0 : 180);
 
