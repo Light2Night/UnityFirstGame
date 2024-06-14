@@ -4,7 +4,7 @@ public class Move : MonoBehaviour {
 	public Rigidbody2D rigidbodyObj;
 	public Collider2D colliderObj;
 	public Animator animatorObj;
-	public GameObject catPrefab;
+	public GameObject bulletPrefab;
 
 	Vector3 rightDirection;
 	Vector3 leftDirection;
@@ -89,9 +89,17 @@ public class Move : MonoBehaviour {
 		}
 
 		if (Input.GetKeyDown(KeyCode.F)) {
+			var directionSign = Mathf.Sign(transform.localScale.x);
 			var localPosition = transform.localPosition;
-			localPosition += 3 * Mathf.Sign(transform.localScale.x) * transform.right;
-			Instantiate(catPrefab, localPosition, transform.localRotation);
+			localPosition += 0.5F * directionSign * transform.right;
+
+			int angel = ((directionSign == 1) ? 0 : 180);
+
+			var eulerAngles = transform.localRotation.eulerAngles;
+			eulerAngles = new Vector3(eulerAngles.x + angel, eulerAngles.y + angel, eulerAngles.z);
+			var quaternion = Quaternion.Euler(eulerAngles);
+
+			Instantiate(bulletPrefab, localPosition, quaternion);
 		}
 	}
 
