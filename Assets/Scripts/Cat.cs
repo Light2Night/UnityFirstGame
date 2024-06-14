@@ -4,6 +4,10 @@ public class Move : MonoBehaviour {
 	public Rigidbody2D rigidbodyObj;
 	public Collider2D colliderObj;
 	public Animator animatorObj;
+	public GameObject catPrefab;
+
+	Vector3 rightDirection;
+	Vector3 leftDirection;
 
 	float speed = 1000F;
 	float walkingSpeedMultiplier = 0.5F;
@@ -11,7 +15,6 @@ public class Move : MonoBehaviour {
 	float flip;
 	float flipGrounded = 0.5F;
 	float flipInAir = 0.2F;
-	float localScaleX;
 	float groundCheckDistance = 0.03f;
 	bool isGrounded;
 	bool isRunning;
@@ -20,7 +23,8 @@ public class Move : MonoBehaviour {
 
 	// Start is called before the first frame update
 	void Start() {
-		localScaleX = transform.localScale.x;
+		rightDirection = transform.localScale;
+		leftDirection = new Vector3(-rightDirection.x, rightDirection.y, rightDirection.z);
 	}
 
 	// Update is called once per frame
@@ -83,6 +87,12 @@ public class Move : MonoBehaviour {
 			scale.x = -scale.x;
 			transform.localScale = scale;
 		}
+
+		if (Input.GetKeyDown(KeyCode.F)) {
+			var localPosition = transform.localPosition;
+			localPosition += 3 * Mathf.Sign(transform.localScale.x) * transform.right;
+			Instantiate(catPrefab, localPosition, transform.localRotation);
+		}
 	}
 
 	bool IsGrounded() {
@@ -98,8 +108,6 @@ public class Move : MonoBehaviour {
 	void MoveHorizontally(int sign, float speedMultiplier = 1) {
 		rigidbodyObj.AddForce(speed * speedMultiplier * sign * Time.deltaTime * transform.right);
 
-		Vector3 v = transform.localScale;
-		v.x = sign * localScaleX;
-		transform.localScale = v;
+		transform.localScale = (sign > 0) ? rightDirection : leftDirection;
 	}
 }
