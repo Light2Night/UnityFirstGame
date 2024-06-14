@@ -1,8 +1,9 @@
 using UnityEngine;
 
 public class Move : MonoBehaviour {
-	Animator animator;
-	Rigidbody2D rigidbodyObj;
+	public Rigidbody2D rigidbodyObj;
+	public Collider2D colliderObj;
+	public Animator animatorObj;
 
 	float speed = 1000F;
 	float walkingSpeedMultiplier = 0.5F;
@@ -10,7 +11,7 @@ public class Move : MonoBehaviour {
 	float flip;
 	float flipGrounded = 0.5F;
 	float flipInAir = 0.2F;
-	float x;
+	float localScaleX;
 	float groundCheckDistance = 0.03f;
 	bool isGrounded;
 	bool isRunning;
@@ -19,10 +20,7 @@ public class Move : MonoBehaviour {
 
 	// Start is called before the first frame update
 	void Start() {
-		animator = GetComponent<Animator>();
-		rigidbodyObj = GetComponent<Rigidbody2D>();
-		x = transform.localScale.x;
-		isRunning = false;
+		localScaleX = transform.localScale.x;
 	}
 
 	// Update is called once per frame
@@ -59,47 +57,48 @@ public class Move : MonoBehaviour {
 
 
 			if (Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W)) {
-				rigidbodyObj.AddForce(transform.up * jump, ForceMode2D.Impulse);
+				rigidbodyObj.AddForce(jump * transform.up, ForceMode2D.Impulse);
 			}
 		}
 
-		animator.SetBool("IsRunning", isRunning);
-		animator.SetBool("IsWalking", isWalking);
-		animator.SetBool("IsGrounded", isGrounded);
+		animatorObj.SetBool("IsRunning", isRunning);
+		animatorObj.SetBool("IsWalking", isWalking);
+		animatorObj.SetBool("IsGrounded", isGrounded);
 
 		if (Input.GetKeyDown(KeyCode.Q)) {
 			rigidbodyObj.AddTorque(flip, ForceMode2D.Impulse);
-			animator.SetBool("IsRunning", false);
+			animatorObj.SetBool("IsRunning", false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
 			rigidbodyObj.AddTorque(-flip, ForceMode2D.Impulse);
-			animator.SetBool("IsRunning", false);
+			animatorObj.SetBool("IsRunning", false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.R)) {
 			transform.Rotate(new Vector3(0, 0, 180));
-		}
 
-		//Debug.DrawLine(transform.position, -transform.up * 5, Color.blue, 2.0f, false);
+			var scale = transform.localScale;
+			scale.x = -scale.x;
+			transform.localScale = scale;
+		}
 	}
 
 	bool IsGrounded() {
-		Collider2D collider = GetComponent<Collider2D>();
-		Vector2 bottom = collider.bounds.center - new Vector3(0, collider.bounds.extents.y + groundCheckDistance, 0);
+		Vector2 bottom = colliderObj.bounds.center - new Vector3(0, colliderObj.bounds.extents.y + groundCheckDistance, 0);
 
 		RaycastHit2D hit = Physics2D.Raycast(bottom, Vector2.down, groundCheckDistance);
 
-		Debug.DrawLine(bottom, bottom + Vector2.down * groundCheckDistance, Color.green, 5F);
+		//Debug.DrawLine(bottom, bottom + Vector2.down * groundCheckDistance, Color.green, 5F);
 
 		return hit.collider != null;
 	}
 
 	void MoveHorizontally(int sign, float speedMultiplier = 1) {
-		rigidbodyObj.AddForce((speed * speedMultiplier) * sign * Time.deltaTime * transform.right);
+		rigidbodyObj.AddForce(speed * speedMultiplier * sign * Time.deltaTime * transform.right);
 
 		Vector3 v = transform.localScale;
-		v.x = sign * x;
+		v.x = sign * localScaleX;
 		transform.localScale = v;
 	}
 }
