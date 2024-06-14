@@ -58,6 +58,7 @@ public class Move : MonoBehaviour {
 
 			if (Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W)) {
 				rigidbodyObj.AddForce(jump * transform.up, ForceMode2D.Impulse);
+				animatorObj.SetTrigger("Jump");
 			}
 		}
 
